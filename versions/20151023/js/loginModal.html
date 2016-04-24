@@ -1,0 +1,29 @@
+<div class="modal-wrapper" modal-draggable modal-draggable-target=".modal-dialog" modal-draggable-handle=".modal-header">
+  <div class="modal-content">
+    <form name="loginForm"  novalidate="" autocomplete="off" shake-that submitted="submitted" ng-submit="submit()">
+      <div class="modal-header">
+        <button type="button" title="Cancel" class="close" ng-click="close()" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h1 class="modal-title cab-draggable" id="login-label">Account Login</h1>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" ng-class="{'has-error': form.username.$invalid}">
+          <label for="username" class="control-label">Username</label>
+          <input type="username" class="form-control" id="username" name="username" placeholder="Username..." ng-model="username" ng-model-options="{updateOn: 'blur'}" required="">
+        </div>
+        <div class="form-group" ng-class="{'has-error': form.password.$invalid}">
+          <label for="password" class="control-label">Password</label>
+          <div class="input-group">
+            <input type="{{ passwordVisible == true ? 'text' : 'password' }}" id="mod_login_password" class="form-control" name="password" alt="password" title="Password" ng-model="password" ng-model-options="{updateOn: 'blur'}" placeholder="{{ 'Password...' }}">
+            <span class="input-group-addon cab-clickable"><i title="Show password" ng-click="passwordVisible = !passwordVisible" class="fa fa-lg" ng-class="{'fa-eye': passwordVisible, 'fa-eye-slash': !passwordVisible}"></i></span>
+          </div>
+        </div>
+        <span ng-hide="error" class="text-info"  >Use the same credentials you use to login to your PC</span>
+        <span ng-show="error" class="text-danger">Login failed. Please check your credentials and try again</span>
+      </div>
+      <div class="modal-footer">
+        <button title="Cancel" class="btn btn-default btn-noborder" ng-click="close()">CANCEL</button>
+        <button title="Login" type="submit" class="btn btn-default btn-noborder">LOGIN</button>
+      </div>
+    </form>
+  </div>
+</div>

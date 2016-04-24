@@ -1,0 +1,487 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]>-->
+<!--
+########################
+## Site: portfolio    ##
+## Auth: Chris Mathis ##
+## File: index.php    ##
+## Date: Feb. 7, 2015 ##
+########################
+-->
+<html class="no-js" lang="en" data-ng-app="master">
+<!--<![endif]-->
+	<head>
+		<title>Christopher Mathis | Portfolio</title>
+		<!-- page meta data -->
+		<meta charset="utf-8">
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<!-- Responsive and mobile friendly meta -->
+		<meta name="HandheldFriendly" content="True">
+		<meta name="MobileOptimized" content="320">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<!-- site detail meta -->
+		<meta name="description" content="An online portfolio to showcase my work, tell you about myself, and to provide a point of contact.">
+	 	<meta name="author" content="Christopher Mathis">
+
+		<!-- external css styles -->
+		<link rel="stylesheet" href="./css/bootstrap.min.css" type="text/css" media="all">
+		<link rel="stylesheet" href="./css/styles.css" type="text/css" media="all">
+
+		<!-- custom fonts -->
+	   <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css" type="text/css" media="all">
+	   <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" type="text/css" media="all">
+	   <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Montserrat:400,700" type="text/css" media="all">
+
+		<!-- js external scripts -->
+		<script type="text/javascript" src="./js/jquery-2.1.3.min.js"></script>
+		<script type="text/javascript" src="./js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="./js/angular/angular.min.js"></script>
+		<script type="text/javascript" src="./js/angular/ngSanitize/angular-sanitize.min.js"></script>
+		<script type="text/javascript" src="./js/jquery.easing.min.js"></script>
+
+		<!-- custom Angular scripts -->
+		<script type="text/javascript" src="./js/app.js"></script>
+		<script type="text/javascript" src="./js/controller.js"></script>
+		<script type="text/javascript" src="./js/ui-bootstrap-0.12.1.min.js"></script>
+
+		<!-- custom jquery -->
+		<script type="text/javascript">
+			// remove class if JS is enabled
+			$("html").removeClass("no-js");
+
+			// document.ready functions
+			$(function() {
+				// collapse the navbar on scroll
+				$(window).scroll(function() {
+				   if ($(".navbar").offset().top > 50) {
+				      $(".navbar-fixed-top").addClass("top-nav-collapse");
+			    	} else {
+			        	$(".navbar-fixed-top").removeClass("top-nav-collapse");
+			    	}
+			    	if ($(".navbar").offset().top > 800) {
+			    		$(".page-rewind").fadeIn();
+			    	} else {
+			    		$(".page-rewind").fadeOut();
+			    	}
+				});
+
+				// page scrolling - requires jQuery easing plugin
+		    	$('a.page-scroll').bind('click', function(event) {
+		        	var anchor = $(this);
+		        	$('html, body').stop().animate({
+	            		scrollTop: $(anchor.attr('href')).offset().top
+			      	}, 1500, 'easeInOutExpo');
+			      	event.preventDefault();
+			    });
+
+			    /*$('.page-rewind').click(function() {
+					$('html, body').stop().animate({scrollTop : 0}, 1500, 'easeInOutExpo');
+					return false;
+				});*/
+
+			   // closes the responsive menu on menu item click
+				$('.navbar-collapse ul li a').click(function() { $('.navbar-toggle:visible').click(); });
+
+				// set focus to the first field in the modal once opened
+				$("#contact-modal").on("shown.bs.modal", function() { $("#name").focus(); });
+
+				// client validation for contact form fields
+				$("#contactForm input, textarea").not("#phone").on("blur", function() { 
+					var fld = "#" + $(this).attr("id"); 
+					if (!$(fld).val()) { 
+						$(fld).parent("div").parent("div.form-group").addClass("has-error"); 
+					} else if ($(fld).val()) {
+						$(fld).parent("div").parent("div.form-group").addClass("has-success").removeClass("has-error");
+					} else {
+						$(fld).parent("div").parent("div.form-group").removeClass("has-error").removeClass("has-success");
+					}
+				}); // client side validation
+
+				// submit the contact form
+				$("#contact-submit").on("click", function(e) {
+					e.preventDefault();
+					var data = $("#contactForm").serialize();
+
+					$.ajax({
+						url: "submit.php",
+						data: data,
+						type: "POST",
+						cache: false,
+						dataType: "json"
+					}).done(function(response) {
+						if (response.error) {
+							$("#msg-response").html(response.error).addClass("alert-danger");
+							$(response.field).css("border-color", "#a94442");
+							$(response.field).parent("div").siblings("label").css("color", "#a94442");
+						} else if (response.data) {
+							$("#msg-response").html(response.data).addClass("alert-success");
+							if ($("#msg-response").hasClass("alert-danger")) {
+								$("#msg-response").removeClass("alert-danger");
+								$("#contactForm :input").css("border-color", "#3c763d").parent("div").siblings("label").css("color", "#3c763d");
+							}
+						} else {
+							$("#msg-response").html(response).addClass("alert-info");
+						}
+					});
+				}); // end contact form submit
+
+			}); // end document.ready functions
+		</script>
+	</head>
+	<!-- view port begins -->
+	<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" data-ng-controller="worker">
+		<!-- navigation -->
+	   <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+	      <div class="container-fluid">
+	         <div class="navbar-header">
+	            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+	               <i class="fa fa-bars"></i>
+	            </button> <!-- end a.navbar-toggle -->
+	            <a class="navbar-brand page-scroll" href="#page-top">
+	               <i class="fa fa-play-circle"></i>  <span class="light">My</span> Portfolio
+	            </a> <!-- end a.page-scroll -->
+	         </div> <!-- end .navbar-header
+
+	         <!-- nav links, forms, and other content for toggling -->
+	         <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+				<ul class="nav navbar-nav" data-ng-controller="navLinks">
+					<!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+					<li class="hidden"><a href="#page-top"></a></li>
+					<li data-ng-repeat="x in links">
+						<a class="page-scroll" href="{{'#' + x.href}}">{{x.title}}</a>
+					</li>
+				</ul> <!-- end ul.navbar-nav -->
+			</div> <!-- end .navbar-collapse -->
+	      </div> <!-- end .container-fluid -->     
+	   </nav> <!-- end nav -->
+
+	   <!-- header -->
+	   <header class="intro">
+	      <div class="intro-body">
+	         <div class="container">
+	            <div class="row">
+	               <div class="col-md-8 col-md-offset-2">
+	                  <h1 class="brand-heading">Christopher Mathis</h1>
+	                  <p class="intro-text">An experienced front and<br>back-end Web Developer</p>
+	                  <a href="#about" class="btn btn-circle page-scroll">
+	                     <i class="fa fa-angle-double-down animated"></i>
+	                  </a> <!-- end a.page-scroll -->
+	               </div> <!-- end .col-md-8 -->
+	            </div> <!-- end .row -->
+	         </div> <!-- end .container -->
+	      </div> <!-- end .intro-body -->
+	   </header> <!-- end header -->
+	   <!--<a href="#" class="btn btn-circle page-rewind pull-right hidden-xs hidden-sm">
+         <i class="fa fa-angle-double-up animated"></i>
+      </a>  end a.page-rewind -->
+	   <!--[if lt IE 10]>
+	   <div class="alert alert-info text-center" role="alert"><span class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+			This site uses semantic HTML. If any one of the pages don't display correctly, it is due to an outdated browser. 
+			You should always use the newest version of your preferred browser for security and user experience (UX) purposes.
+		</div>
+		<![endif]-->
+	   <!-- about section -->
+	   <section id="about" class="container content-section text-center">
+	      <div class="row">
+	      	<h2 class="sectionHead">About Me</h2>
+	         <div class="col-lg-8 col-lg-offset-2" data-ng-controller="aboutMe">
+	         	<p class="lead" data-ng-repeat="x in abouts" data-ng-bind-html="x.about"></p>
+	         </div> <!-- end .col-lg-8 -->
+	      </div> <!-- end .row -->
+	   </section> <!-- end #about -->
+
+	   <!-- education section -->
+	   <section id="education" class="container content-section text-center">
+	      <div class="row">
+	         <h2 class="sectionHead">My Education</h2>
+	         <div class="col-lg-8 col-lg-offset-2">
+					<table id="edTbl" class="table">
+						<thead>
+							<tr>
+								<th colspan="2" class="text-center">Year</th>
+								<th class="text-center">Institution</th>
+								<th class="text-center">Degree</th>
+								<th class="text-center">Major</th>
+								<th class="text-center hidden-xs">Location</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="2"><p class="lead">2011-2014</p></td>
+								<td><p class="lead">Baker College</p></td>
+								<td><p class="lead">BA</p></td>
+								<td><p class="lead">Web Development</p></td>
+								<td class="hidden-xs"><p class="lead">Flint, MI</p></td>
+							</tr>
+							<tr>
+								<td colspan="2"><p class="lead">2009-2011</p></td>
+								<td>
+									<p class="lead visible-xs">
+										<abbr title="Northeast Iowa Community College">NICC</abbr>
+									</p>
+									<p class="lead hidden-xs">Northeast Iowa Community College</p>
+								</td>
+								<td><p class="lead">AAS</p></td>
+								<td><p class="lead">Computer Analyst: Business &amp; Web Programming</p></td>
+								<td class="hidden-xs"><p class="lead">Peosta, IA</p></td>
+							</tr>
+						</tbody>
+					</table>
+	         </div> <!-- end .col-lg-8 -->
+	      </div> <!-- end .row -->
+	   </section> <!-- end #education -->
+
+	   <!-- experience section -->
+	   <section id="experience" class="container content-section text-center">
+	      <div class="row">
+            <h2 class="sectionHead">My Experience</h2>
+	         <div class="col-lg-8 col-lg-offset-2">
+	            <table id="expTbl" class="table">
+						<thead>
+							<tr>
+								<th class="text-center">Year</th>
+								<th class="text-center">Company</th>
+								<th class="text-center hidden-xs">Location</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>2013–Present</td>
+								<td>Cabelas Inc</td>
+								<td class="hidden-xs">Prairie du Chein, WI</td>
+							</tr>
+							<tr>
+								<td colspan="3"><p class="lead">Reporting Specialist II (Web Programmer): I have been working in the Reporting department for nearly two years utilizing PHP, jQuery, HTML, CSS, and SQL for Oracle to design and develop internal Web applications. I work with version control and test, development, and production database and server environments. I also manage multiple projects with various priority levels and due dates on a regular basis.</p>
+								<p class="lead">My latest project involved recreating the template utilized for all of our internal web pages with Bootstrap. This change was due to the company beginning to use tablets on the production floor, which our current template did not support in a user friendly fashion.</p><td>
+							</tr>
+							<tr>
+								<td>2005–2009</td>
+								<td>Pamida Co</td>
+								<td class="hidden-xs">Savanna, IL</td>
+							</tr>
+							<tr>
+								<td colspan="3"><p class="lead">Assistant Manager: I started when I was sixteen at Pamida and was promoted after a year to Operations Team Leader to manage all floor operations. Another year later I was promoted to Assistant Manager to oversee all operations and assisting in team management.</p></td>
+							</tr>
+						</tbody>
+					</table>
+	         </div> <!-- end .col-lg-8 -->
+	      </div> <!-- end .row -->
+	   </section> <!-- end #experience -->
+
+	   <!-- showcase section -->
+	   <section id="showcase" class="container content-section text-center">
+	      <div class="row">
+	      	<h2 class="sectionHead">Showcase</h2>
+	         <div class="col-lg-8 col-lg-offset-2">
+					<div class="row showcase store">
+						<div class="col-md-7">
+							<h2 class="showcase-heading">LaBarge Music <span class="text-muted">With admin CMS!</span></h2>
+							<p class="lead visible-md-block visible-lg-block">Built Bootstrap, jQuery, and jQuery UI, this modern music site offers 
+								musicians an online way to inform their fans when and where they are playing, you can listen to music directly on the site, read more about the band and each member, and a contact dialog to email the band.</p> <!-- end .lead -->
+							<div class="skillset visible-md-block visible-lg-block">
+								PHP <span class="badge"><i class="fa fa-check-square"></i></span>
+								jQuery <span class="badge"><i class="fa fa-check-square"></i></span>
+								HTML5 <span class="badge"><i class="fa fa-check-square"></i></span>
+								CSS3 <span class="badge"><i class="fa fa-check-square"></i></span>
+								SQL <span class="badge"><i class="fa fa-check-square"></i></span>
+							</div> <!-- end .skillset -->
+						</div> <!-- end .col-md-7 -->
+						<div class="col-md-5">
+							<a href="../../../labarge-music/versions/20150110/index.php" target="_blank">
+								<img src="img/labarge-guitar.png" class="showcase-image img-responsive" data-src="holder.js/500x500/auto" alt="LaBarge Music Website Photo and Link">
+							</a>
+						</div> <!-- end .col-md-5 -->
+						<div class="row minor visible-xs-block visible-sm-block">
+							<div class="col-md-12">
+								<p class="lead">Built on the Bootstrap grid system, this modern eCommerce site offers a customizable design and serves 
+									as the perferct store for any size online business. The administrator can control the content of the site through a 
+									robust backend management system!</p> <!-- end .lead -->
+								<div class="skillset">
+									PHP <span class="badge"><i class="fa fa-check-square"></i></span>
+									jQuery <span class="badge"><i class="fa fa-check-square"></i></span>
+									HTML5 <span class="badge"><i class="fa fa-check-square"></i></span>
+									CSS3 <span class="badge"><i class="fa fa-check-square"></i></span>
+									SQL <span class="badge"><i class="fa fa-check-square"></i></span>
+								</div> <!-- end .skillset -->
+							</div> <!-- end .col-md-12 -->
+						</div> <!-- end .row .minor -->
+					</div> <!-- end .row .showcase -->
+
+					<hr class="showcase-divider">
+
+					<div class="row showcase blog">
+						<div class="col-md-7 visible-xs-block visible-sm-block">
+							<h2 class="showcase-heading">My Blog, the new and approved! 
+							<span class="text-muted">See for yourself.</span></h2>
+						</div> <!-- end col-md-7 -->
+						<div class="col-md-5">
+							<img class="showcase-image img-responsive" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
+						</div> <!-- end .col-md-5 -->
+						<div class="col-md-7">
+							<h2 class="showcase-heading visible-md-block visible-lg-block">My Blog, the new and approved! 
+							<span class="text-muted">See for yourself.</span></h2>
+							<p class="lead visible-md-block visible-lg-block">My new and approved Blog, built on the Bootstrap grid system, 
+								offers a better way to find content with the new subscribe capability. I have also resurfaced the look with 
+								a modern materialized design that look great on any device!</p> <!-- end .lead -->
+							<div class="skillset visible-md-block visible-lg-block">
+								PHP <span class="badge"><i class="fa fa-check-square"></i></span>
+								jQuery <span class="badge"><i class="fa fa-check-square"></i></span>
+								HTML5 <span class="badge"><i class="fa fa-check-square"></i></span>
+								CSS3 <span class="badge"><i class="fa fa-check-square"></i></span>
+								SQL <span class="badge"><i class="fa fa-check-square"></i></span>
+							</div> <!-- end .skillset -->
+						</div> <!-- end .col-md-7 -->
+						<div class="row minor visible-xs-block visible-sm-block">
+							<div class="col-md-12">
+								<p class="lead">My new and approved Blog, built on the Bootstrap grid system, offers a better way to find 
+									content with the new subscribe capability. I have also resurfaced the look with a modern materialized 
+									design that looks great on any device!</p> <!-- end .lead -->
+								<div class="skillset">
+									PHP <span class="badge"><i class="fa fa-check-square"></i></span>
+									jQuery <span class="badge"><i class="fa fa-check-square"></i></span>
+									HTML5 <span class="badge"><i class="fa fa-check-square"></i></span>
+									CSS3 <span class="badge"><i class="fa fa-check-square"></i></span>
+									SQL <span class="badge"><i class="fa fa-check-square"></i></span>
+								</div> <!-- end .skillset -->
+							</div> <!-- end .col-md-12 -->
+						</div> <!-- end .row .minor -->
+					</div> <!-- end .row .showcase -->
+
+					<hr class="showcase-divider">
+
+					<div class="row showcase extra">
+						<div class="col-md-7">
+							<h2 class="showcase-heading">A Music Library <span class="text-muted">With sharing!</span></h2>
+							<p class="lead visible-md-block visible-lg-block">Built on the Bootstrap grid system, this site allows users to register 
+							and upload music into their online library. Track can be organized into artist, album, genre, or your own custom categories. 
+							Users have the ability to play the tracks in their library and even share them with other users.</p> <!-- end .lead -->
+							<div class="skillset visible-md-block visible-lg-block">
+								MongoDB <span class="badge"><i class="fa fa-check-square"></i></span>
+								Express <span class="badge"><i class="fa fa-check-square"></i></span>
+								AngularJS <span class="badge"><i class="fa fa-check-square"></i></span>
+								NodeJS <span class="badge"><i class="fa fa-check-square"></i></span>
+							</div> <!-- end .skillset -->
+						</div> <!-- end .col-md-7 -->
+						<div class="col-md-5">
+							<img class="showcase-image img-responsive" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
+						</div> <!-- end .col-md-5 -->
+						<div class="row minor visible-xs-block visible-sm-block">
+							<div class="col-md-12">
+								<p class="lead">Built on the Bootstrap grid system, this site allows users to register and upload music into their 
+								online library. Track can be organized into artist, album, genre, or your own custom categories. Users have the ability 
+								to play the tracks in their library and even share them with other users.</p> <!-- end .lead -->
+								<div class="skillset">
+									MongoDB <span class="badge"><i class="fa fa-check-square"></i></span>
+									Express <span class="badge"><i class="fa fa-check-square"></i></span>
+									AngularJS <span class="badge"><i class="fa fa-check-square"></i></span>
+									NodeJS <span class="badge"><i class="fa fa-check-square"></i></span>
+								</div> <!-- end .skillset -->
+							</div> <!-- end .col-md-12 -->
+						</div> <!-- end .row .minor -->
+					</div> <!-- end .row .showcase -->
+	         	</div> <!-- end .col-lg-8 -->
+	      	</div> <!-- end .row -->
+	   </section> <!-- end #showcase -->
+
+	  <!-- skill-level section -->
+	   <section id="expertise" class="container content-section text-center">
+	      <div class="row">
+            <h2 class="sectionHead">My Skill Levels</h2>
+	         <div class="col-lg-8 col-lg-offset-2" data-ng-controller="mySkills">
+	         	<div class="progress" data-ng-repeat="x in skills">
+	         	<div class="progress-bar" role="progressbar" aria-valuenow="{{x.fill}}" aria-valuemin="0" aria-valuemax="100" style="width:{{x.fill}}%">
+         			<span class="pull-left" data-ng-bind-html="x.skill"></span>
+         			<span class="sr-only">Fill level {{x.fill}}%, skill level {{x.level | lowercase}}</span>
+         		</div> <!-- end .progress-bar -->
+	         		<span class="pull-right">{{x.level}}</span>
+	         	</div> <!-- end .progress -->
+	         </div> <!-- end .col-lg-8 -->
+	      </div> <!-- end .row -->
+	   </section> <!-- end #skill-level -->
+
+	   <!-- contact section -->
+	   <section id="contact" class="container content-section text-center">
+	      <div class="row">
+            <h2 class="sectionHead">Contact Me</h2>
+	         <div class="col-lg-8 col-lg-offset-2">
+	            <p>Feel free to email me to request my resume or more details, offer an interview, or to just say hello!</p>
+	            <ul class="list-inline banner-social-buttons">
+	               <li>
+						<!--<a href="#contact" class="btn btn-default btn-lg" data-ng-click="contactModal()">-->
+						<a href="#contact" class="btn btn-default btn-lg" data-toggle="modal" data-target="#contact-modal">
+	            		<i class="fa fa-envelope-o fa-fw"></i> <span class="network-name">Email Me</span></a>
+	               </li>
+	               <li>
+						<a href="https://www.linkedin.com/in/ChristopherDMathis" class="btn btn-default btn-lg">
+						<i class="fa fa-linkedin-square fa-fw"></i> <span class="network-name">Linked In</span></a>
+	               </li>
+	               <li>
+						<a href="https://plus.google.com/102349606079083895761/about" class="btn btn-default btn-lg">
+						<i class="fa fa-google-plus fa-fw"></i> <span class="network-name">Google+</span></a>
+	               </li>
+	               <li>
+						<a href="http://stackoverflow.com/users/2969776/nightowlprgmr" class="btn btn-default btn-lg">
+						<i class="fa fa-stack-exchange fa-fw"></i> <span class="network-name">Stack Overflow</span></a>
+	               </li>
+	            </ul> <!-- end ul.list-inline -->
+	         </div> <!-- end .col-lg-8 -->
+	      </div> <!-- end .row -->
+	   </section> <!-- end #contact -->
+
+	   <!-- footer -->
+	   <footer>
+	      <div class="container text-center">
+	         <p>Copyright &copy; Christopher Mathis' Portfolio 2015</p>
+	      </div> <!-- end .container -->
+	   </footer> <!-- end footer -->
+
+		<!-- contact me modal -->
+		<div class="modal fade" id="contact-modal" tabindex="-1" role="dialog" aria-labelledby="contactLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="contactLabel">Contact Me</h4>
+					</div> <!-- end .modal-header -->
+					<div class="modal-body">
+						<form id="contactForm" class="form-horizontal">
+							<div class="form-group name">
+								<label for="name" class="col-sm-2 control-label">Name</label>
+								<div class="col-sm-10">
+									<input type="text" class="form-control" id="name" name="name" placeholder="Name">
+								</div> <!-- end .col-sm-10 -->
+							</div> <!-- end .form-group -->
+							<div class="form-group email">
+								<label for="email" class="col-sm-2 control-label">Email</label>
+								<div class="col-sm-10">
+									<input type="email" class="form-control" id="email" name="email" placeholder="Email">
+								</div> <!-- end .col-sm-10 -->
+							</div> <!-- end .form-group -->
+							<div class="form-group">
+								<label for="phone" class="col-sm-2 control-label">Phone</label>
+								<div class="col-sm-10">
+									<input type="phone" class="form-control" id="phone" name="phone" placeholder="Phone">
+								</div> <!-- end .col-sm-10 -->
+							</div> <!-- end .form-group -->
+							<div class="form-group message">
+								<label for="message" class="col-sm-2 control-label">Message</label>
+								<div class="col-sm-10">
+									<textarea id="message" name="message" class="form-control" rows="3" placeholder="Message"></textarea>
+								</div> <!-- end .col-sm-10 -->
+							</div> <!-- end .form-group -->
+							<div class="row text-center"><div id="msg-response" class="alert"></div></div>
+						</form> <!-- end form #contactForm -->
+					</div> <!-- end .modal-body -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						<button type="button" class="btn btn-primary" id="contact-submit">Send</button>
+					</div> <!-- end .modal-footer -->
+				</div> <!-- end .modal-content -->
+			</div> <!-- end .modal-dialog -->
+		</div> <!-- end #contact-modal -->
+	</body> <!-- end body -->
+</html> <!-- end html -->
